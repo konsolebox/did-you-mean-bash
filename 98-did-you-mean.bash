@@ -69,26 +69,28 @@ function did_you_mean {
 			IFS= read -rd '' best_match < <(pick-best-match -0 -- "${command_args}" \
 					"${possible_commands[@]}")
 
-			_did_you_mean_simple_quote "${best_match}"
+			if [[ ${best_match} != "${command_args}" ]]; then
+				_did_you_mean_simple_quote "${best_match}"
 
-			if [[ ${#command_args[@]} -eq 1 ]]; then
-				new_command=$__
-			else
-				# TODO: Need a better way to remove the first word
-				new_command=$__" ${last_command##*([[:space:]])+([![:space:]])*([[:space:]])}"
-			fi
+				if [[ ${#command_args[@]} -eq 1 ]]; then
+					new_command=$__
+				else
+					# TODO: Need a better way to remove the first word
+					new_command=$__" ${last_command##*([[:space:]])+([![:space:]])*([[:space:]])}"
+				fi
 
-			until
-				read -N1 -rp "Did you mean \"${new_command//$'\n'/\\n}\"? " -d ''
-				[[ ${REPLY} == $'\n' ]] || echo
-				[[ ${REPLY} == [yYnN] ]]
-			do
-				:
-			done
+				until
+					read -N1 -rp "Did you mean \"${new_command//$'\n'/\\n}\"? " -d ''
+					[[ ${REPLY} == $'\n' ]] || echo
+					[[ ${REPLY} == [yYnN] ]]
+				do
+					:
+				done
 
-			if [[ ${REPLY} == [yY] ]]; then
-				eval -- "${new_command}"
-				r=$?
+				if [[ ${REPLY} == [yY] ]]; then
+					eval -- "${new_command}"
+					r=$?
+				fi
 			fi
 		fi
 
