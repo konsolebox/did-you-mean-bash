@@ -65,7 +65,7 @@ function did_you_mean {
 			possible_commands=("${DID_YOU_MEAN_COMMANDS_CACHE[@]}")
 		fi
 
-		if [[ ${command_args+.} && ${possible_commands+.} ]]; then
+		if [[ ${command_args+.} && ${command_args} != exec && ${possible_commands+.} ]]; then
 			IFS= read -rd '' best_match < <(pick-best-match -0 -- "${command_args}" \
 					"${possible_commands[@]}")
 
@@ -81,7 +81,7 @@ function did_you_mean {
 			until
 				read -N1 -rp "Did you mean \"${new_command//$'\n'/\\n}\"? " -d ''
 				[[ ${REPLY} == $'\n' ]] || echo
-				[[ ${REPLY} == [yn] ]]
+				[[ ${REPLY} == [yYnN] ]]
 			do
 				:
 			done
